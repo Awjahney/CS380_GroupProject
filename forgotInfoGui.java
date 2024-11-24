@@ -1,10 +1,9 @@
 import javax.swing.*;
 
-public class createAccGui {
-
+public class forgotInfoGui {
     private JPanel guiPanel;
-    private JButton createAccountButton;
-    private JTextField textField1;
+    private JButton findAccountButton;
+    private JTextArea textArea1;
     private JFrame guiFrame = new JFrame("Weekly Scheduler");
 
     public void buildGuiPanel() {
