@@ -23,8 +23,14 @@ public class remindersGui {
     private JFrame guiFrame2 = new JFrame("Weekly Scheduler");
     public void buildGuiPanel() {
         guiPanel2.setVisible(true);
-        guiFrame2.setSize(600, 300);
+        guiFrame2.setSize(600, 900);
         guiFrame2.setContentPane(guiPanel2);
         guiFrame2.setVisible(true);
+
+        returnToWeeklyScheduleButton.addActionListener(e -> {
+            guiFrame2.dispose();  // Close the Reminders window
+            schedulerGui schedulerPage = new schedulerGui();
+            schedulerPage.buildGuiPanel();  // Open the Scheduler GUI
+        });
     }
 }
