@@ -48,18 +48,19 @@ public class loginGui {
         }
 
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+            String sql = "SELECT user_id FROM users WHERE username = ? AND password = ?";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, username);
                 stmt.setString(2, password);
 
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
+                        int userId = rs.getInt("user_id"); // Get the user ID
                         JOptionPane.showMessageDialog(guiFrame3, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
                         guiFrame3.dispose();  // Close the login window
 
-                        // Open the scheduler page
-                        schedulerGui schedulerPage = new schedulerGui();
+                        // Pass the userId to the scheduler GUI
+                        schedulerGui schedulerPage = new schedulerGui(userId);
                         schedulerPage.buildGuiPanel(); // Transition to scheduler page
                     } else {
                         JOptionPane.showMessageDialog(guiFrame3, "Invalid username or password.", "Error", JOptionPane.ERROR_MESSAGE);

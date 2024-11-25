@@ -139,10 +139,10 @@ public class Notes {
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 notes.add(new Notes(
-                    rs.getInt("note_id"),
-                    rs.getString("day_of_week"),
-                    rs.getString("content"),
-                    rs.getString("created_at")
+                        rs.getInt("note_id"),
+                        rs.getString("day_of_week"),
+                        rs.getString("content"),
+                        rs.getString("created_at")
                 ));
             }
         }

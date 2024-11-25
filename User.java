@@ -1,9 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 
 /**
  * Represents a user in the Weekly Scheduler application with database integration support.
@@ -33,66 +30,66 @@ public class User {
     }
 
     /**
-     * Fetches all tasks for the user from the database.
+     * Fetches all reminders for the user from the database.
      *
      * @param connection the database connection
-     * @return a list of tasks for the user
+     * @return a list of reminders for the user
      * @throws SQLException if a database error occurs
      */
-    public List<Task> fetchTasks(Connection connection) throws SQLException {
-        List<Task> tasks = new ArrayList<>();
-        String query = "SELECT * FROM tasks WHERE user_id = ?";
+    public List<Reminders> fetchReminders(Connection connection) throws SQLException {
+        List<Reminders> reminders = new ArrayList<>();
+        String query = "SELECT * FROM reminders WHERE user_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, this.userId);
+            stmt.setInt(1, this.userId);  // Use current user's ID
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    int taskId = rs.getInt("task_id");
-                    String title = rs.getString("title");
-                    Task.Priority priority = Task.Priority.valueOf(rs.getString("priority"));
-                    LocalDate date = rs.getDate("date").toLocalDate();
-                    LocalTime reminderTime = rs.getTime("reminder_time").toLocalTime();
-                    String notes = rs.getString("notes");
-
-                    tasks.add(new Task(taskId, title, priority, date, reminderTime, notes));
+                    reminders.add(new Reminders(
+                            rs.getString("task_name"),
+                            rs.getString("reminder_date"),
+                            rs.getString("reminder_time"),
+                            rs.getBoolean("is_active"),
+                            rs.getString("priority") != null ? Reminders.Priority.valueOf(rs.getString("priority")) : null,
+                            rs.getString("content"),
+                            rs.getInt("user_id")  // Get the user_id for reminder
+                    ));
                 }
             }
         }
-        return tasks;
+        return reminders;
     }
 
     /**
-     * Saves a task to the database for the user.
+     * Saves a reminder to the database for the user.
      *
      * @param connection the database connection
-     * @param task the task to save
+     * @param reminder   the reminder to save
      * @throws SQLException if a database error occurs
      */
-    public void saveTask(Connection connection, Task task) throws SQLException {
-        String query = "INSERT INTO tasks (user_id, title, priority, date, reminder_time, notes) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, this.userId);
-            stmt.setString(2, task.getTitle());
-            stmt.setString(3, task.getPriority().name());
-            stmt.setDate(4, Date.valueOf(task.getDate()));
-            stmt.setTime(5, Time.valueOf(task.getReminderTime()));
-            stmt.setString(6, task.getNotes());
-            stmt.executeUpdate();
-        }
-    }
-
-    /**
-     * Deletes a task from the database.
-     *
-     * @param connection the database connection
-     * @param taskId the ID of the task to delete
-     * @throws SQLException if a database error occurs
-     */
-    public void deleteTask(Connection connection, int taskId) throws SQLException {
-        String query = "DELETE FROM tasks WHERE task_id = ? AND user_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, taskId);
-            stmt.setInt(2, this.userId);
-            stmt.executeUpdate();
+    public void saveReminder(Connection connection, Reminders reminder) throws SQLException {
+        // Check if the user exists
+        String checkUserQuery = "SELECT COUNT(*) FROM users WHERE user_id = ?";
+        try (PreparedStatement checkStmt = connection.prepareStatement(checkUserQuery)) {
+            checkStmt.setInt(1, reminder.getUserId());
+            try (ResultSet rs = checkStmt.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    // User exists, now save the reminder
+                    String query = "INSERT INTO reminders (user_id, task_name, reminder_date, reminder_time, priority, content, is_active) "
+                            + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                        stmt.setInt(1, reminder.getUserId());
+                        stmt.setString(2, reminder.getTaskName());
+                        stmt.setDate(3, Date.valueOf(reminder.getReminderDate()));
+                        stmt.setTime(4, Time.valueOf(reminder.getReminderTime()));
+                        stmt.setString(5, reminder.getPriority() != null ? reminder.getPriority().name() : null);
+                        stmt.setString(6, reminder.getContent());
+                        stmt.setBoolean(7, reminder.isActive());
+                        stmt.executeUpdate();
+                        System.out.println("Reminder saved successfully!");
+                    }
+                } else {
+                    throw new SQLException("User with ID " + reminder.getUserId() + " does not exist.");
+                }
+            }
         }
     }
 
