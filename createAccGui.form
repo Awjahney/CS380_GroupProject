@@ -68,7 +68,7 @@
                   </component>
                 </children>
               </grid>
-              <component id="68aab" class="javax.swing.JTextField" binding="textField1" default-binding="true">
+              <component id="68aab" class="javax.swing.JTextField" binding="usernameField">
                 <constraints>
                   <grid row="1" column="2" row-span="1" col-span="9" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -104,7 +104,7 @@
                   <text value="Password:"/>
                 </properties>
               </component>
-              <component id="780bc" class="javax.swing.JTextField" default-binding="true">
+              <component id="780bc" class="javax.swing.JTextField" binding="passwordField">
                 <constraints>
                   <grid row="2" column="2" row-span="1" col-span="9" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -114,7 +114,7 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="ed1cf" class="javax.swing.JTextField" default-binding="true">
+              <component id="ed1cf" class="javax.swing.JTextField" binding="accountIdField">
                 <constraints>
                   <grid row="3" column="2" row-span="1" col-span="9" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>

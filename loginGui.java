@@ -3,7 +3,7 @@ import java.sql.*;
 
 public class loginGui {
     private JPanel guiPanel;
-    private JTextField textField1;
+    private JTextField usernameField;
     private JButton loginButton;
     private JButton createAccountButton;
     private JButton forgotUsernamePasswordButton;
@@ -14,7 +14,6 @@ public class loginGui {
     private final String DB_USER = "root"; // Update with your DB username
     private final String DB_PASSWORD = "ilovelife2093003!"; // Update with your DB password
 
-
     public void buildGuiPanel() {
         guiFrame3.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         guiFrame3.setSize(600, 300);
@@ -23,35 +22,25 @@ public class loginGui {
 
         // Add action listeners for buttons
         loginButton.addActionListener(e -> login());
-        createAccountButton.addActionListener(e -> createAccount());
+        createAccountButton.addActionListener(e -> navigateToCreateAccount());
+        forgotUsernamePasswordButton.addActionListener(e -> navigateToForgotInfo());
     }
 
-    private void createAccount() {
-        String username = textField1.getText();
-        String password = passwordField.getText(); // Get password from JTextField
+    private void navigateToCreateAccount() {
+        guiFrame3.dispose(); // Close login GUI
+        createAccGui accPage = new createAccGui();
+        accPage.buildGuiPanel(); // Open the Create Account GUI
+    }
 
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(guiFrame3, "Username and password cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "INSERT INTO users (username, password) VALUES (?, ?)";
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, username);
-                stmt.setString(2, password);
-                stmt.executeUpdate();
-                JOptionPane.showMessageDialog(guiFrame3, "Account created successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(guiFrame3, "Error creating account: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+    private void navigateToForgotInfo() {
+        guiFrame3.dispose(); // Close login GUI
+        forgotInfoGui forgotPage = new forgotInfoGui();
+        forgotPage.buildGuiPanel(); // Open the Forgot Info GUI
     }
 
     private void login() {
-        String username = textField1.getText();
-        String password = passwordField.getText(); // Get password from JTextField
+        String username = usernameField.getText();
+        String password = passwordField.getText();
 
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(guiFrame3, "Username and password cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -67,10 +56,11 @@ public class loginGui {
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         JOptionPane.showMessageDialog(guiFrame3, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        guiFrame3.dispose();
-                        // Transition to the next GUI (e.g., remindersGui)
-                        remindersGui remindersPage = new remindersGui();
-                        remindersPage.buildGuiPanel();
+                        guiFrame3.dispose();  // Close the login window
+
+                        // Open the scheduler page
+                        schedulerGui schedulerPage = new schedulerGui();
+                        schedulerPage.buildGuiPanel(); // Transition to scheduler page
                     } else {
                         JOptionPane.showMessageDialog(guiFrame3, "Invalid username or password.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
