@@ -6,8 +6,8 @@ public class remindersGui {
     private JButton addReminderButton;
     private JButton returnToWeeklyScheduleButton;
     private JButton addNoteButton;
-    private JButton removeReminderButton;
-    private JButton setPriorityLevelButton;
+    private JButton editReminderButton;
+    private JButton removeReminderButton1;
     private JTextArea textArea1;
     private JTextArea textArea2;
     private JTextArea textArea3;
@@ -21,24 +21,16 @@ public class remindersGui {
     private JTextArea textArea11;
     private JTextArea textArea12;
     private JFrame guiFrame2 = new JFrame("Weekly Scheduler");
-
-    private int userId; // To track the logged-in user's ID
-
-    public remindersGui(int userId) {
-        this.userId = userId; // Save the logged-in user's ID
-    }
-
     public void buildGuiPanel() {
         guiPanel2.setVisible(true);
         guiFrame2.setSize(600, 900);
         guiFrame2.setContentPane(guiPanel2);
         guiFrame2.setVisible(true);
 
-        // Action listener to return to the weekly schedule
         returnToWeeklyScheduleButton.addActionListener(e -> {
-            guiFrame2.dispose(); // Close the Reminders window
-            schedulerGui schedulerPage = new schedulerGui(userId); // Pass userId to schedulerGui
-            schedulerPage.buildGuiPanel(); // Open the Scheduler GUI
+            guiFrame2.dispose();  // Close the Reminders window
+            schedulerGui schedulerPage = new schedulerGui();
+            schedulerPage.buildGuiPanel();  // Open the Scheduler GUI
         });
     }
 }
