@@ -24,5 +24,14 @@ CREATE TABLE users (
     password VARCHAR(20) NOT NULL
 );
 
+CREATE TABLE scheduler_data (
+    user_id INT NOT NULL,               -- User associated with the data
+    date DATE NOT NULL,                 -- Date of the entry
+    content TEXT,                       -- Content for that day
+    PRIMARY KEY (user_id, date),        -- Unique entry per user per day
+    FOREIGN KEY (user_id) REFERENCES users(user_id) -- Relates to the users table
+);
+
+
 
     
