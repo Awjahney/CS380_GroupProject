@@ -54,7 +54,9 @@
                             <preferred-size width="150" height="50"/>
                           </grid>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <editable value="false"/>
+                        </properties>
                       </component>
                       <component id="b3553" class="javax.swing.JButton" binding="backToLoginButton">
                         <constraints>

@@ -4,10 +4,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class schedulerGui {
-    private JPanel guiPanel; // Main panel
-    private JButton previousWeekButton; // Navigate to previous week
-    private JButton goToRemindersButton; // Navigate to reminders GUI
-    private JButton nextWeekButton; // Navigate to next week
+    private JPanel guiPanel;
+    private JButton previousWeekButton;
+    private JButton goToDailyScheduleButton;
+    private JButton nextWeekButton;
     private JTextArea SundayTextArea;
     private JTextArea MondayTextArea;
     private JTextArea TuesdayTextArea;
@@ -24,7 +24,7 @@ public class schedulerGui {
     private final String DB_PASSWORD = "ilovelife2093003!"; // Update with your DB password
 
     public schedulerGui(int userId) {
-        this.userId = userId; // Pass the logged-in user's ID
+        this.userId = userId;
     }
 
     public void buildGuiPanel() {
@@ -33,29 +33,32 @@ public class schedulerGui {
         guiFrame.setContentPane(guiPanel);
         guiFrame.setVisible(true);
 
-        updateDayLabels(); // Initialize day labels with current dates
-        loadDailyData(); // Load any existing data for the current week
+        updateDayLabels(); // Set labels with current week's dates
+        loadDailyData(); // Load data for the current week
 
         // Action listener for navigating to the Reminders GUI
-        goToRemindersButton.addActionListener(e -> {
+        goToDailyScheduleButton.addActionListener(e -> {
             saveDailyData(); // Save data before switching screens
-            guiFrame.dispose(); // Close the scheduler window
-            remindersGui remindersPage = new remindersGui(userId);
+            guiFrame.dispose(); // Close the Scheduler GUI
+            dailyscheduleGui remindersPage = new dailyscheduleGui(userId);
             remindersPage.buildGuiPanel(); // Open the Reminders GUI
         });
 
-        // Action listeners for navigating weeks
+        // Navigate to the previous week
         previousWeekButton.addActionListener(e -> {
-            saveDailyData(); // Save current week's data
+            saveDailyData(); // Save the current week's data
             startDate = startDate.minusWeeks(1); // Move to the previous week
             updateDayLabels(); // Update the displayed dates
+            clearTextFields(); // Clear the text fields
             loadDailyData(); // Load data for the new week
         });
 
+        // Navigate to the next week
         nextWeekButton.addActionListener(e -> {
-            saveDailyData(); // Save current week's data
+            saveDailyData(); // Save the current week's data
             startDate = startDate.plusWeeks(1); // Move to the next week
             updateDayLabels(); // Update the displayed dates
+            clearTextFields(); // Clear the text fields
             loadDailyData(); // Load data for the new week
         });
     }
@@ -70,6 +73,8 @@ public class schedulerGui {
     }
 
     private void saveDailyData() {
+
+        //Saves data to scheduler_data table by based on user_id and date.
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "REPLACE INTO scheduler_data (user_id, date, content) VALUES (?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -110,6 +115,16 @@ public class schedulerGui {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(guiFrame, "Error loading data: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void clearTextFields() {
+        SundayTextArea.setText("");
+        MondayTextArea.setText("");
+        TuesdayTextArea.setText("");
+        WednesdayTextArea.setText("");
+        ThursdayTextArea.setText("");
+        FridayTextArea.setText("");
+        SaturdayTextArea.setText("");
     }
 
     private JTextArea getTextAreaForDay(int dayIndex) {
