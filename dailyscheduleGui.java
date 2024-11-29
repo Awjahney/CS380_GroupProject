@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -7,25 +8,30 @@ public class dailyscheduleGui {
     private JScrollPane guiPane;
     private JButton addReminderButton;
     private JButton returnToWeeklyScheduleButton;
-    private JButton viewReminders;
+    private JButton viewRemindersButton;
     private JButton removeReminderButton;
-    private JTextArea textArea1;
-    private JTextArea textArea2;
-    private JTextArea textArea3;
-    private JTextArea textArea4;
-    private JTextArea textArea5;
-    private JTextArea textArea6;
-    private JTextArea textArea7;
-    private JTextArea textArea8;
-    private JTextArea textArea9;
-    private JTextArea textArea10;
-    private JTextArea textArea11;
-    private JTextArea textArea12;
+    private JTextArea textArea6PM;
+    private JTextArea textArea4PM;
+    private JTextArea textArea5PM;
+    private JTextArea textArea3PM;
+    private JTextArea textArea7PM;
+    private JTextArea textArea8PM;
+    private JTextArea textArea9AM;
+    private JTextArea textArea8AM;
+    private JTextArea textArea7AM;
+    private JTextArea textArea10AM;
+    private JTextArea textArea2PM;
+    private JTextArea textArea6AM;
     private JLabel Date; // Label to show the current day
     private JTextPane viewRemindersPane;
-    private JTextArea textArea13;
-    private JTextArea textArea14;
-    private JFrame guiFrame2 = new JFrame("Reminders");
+    private JTextArea textArea1PM;
+    private JTextArea textArea12PM;
+    private JTextArea textArea11AM;
+    private JFrame guiFrame2 = new JFrame("Daily Schedule");
+
+    private final String DB_URL = "jdbc:mysql://localhost:3306/scheduler_db"; // Update with your database URL
+    private final String DB_USER = "root"; // Update with your DB username
+    private final String DB_PASSWORD = "ilovelife2093003!"; // Update with your DB password
 
     private int userId; // Logged-in user's ID
 
@@ -45,29 +51,50 @@ public class dailyscheduleGui {
 
         // Action listener to return to the weekly schedule
         returnToWeeklyScheduleButton.addActionListener(e -> {
-            guiFrame2.dispose(); // Close the Reminders window
+            guiFrame2.dispose(); // Close the Daily Schedule GUI
             schedulerGui schedulerPage = new schedulerGui(userId); // Pass userId to schedulerGui
             schedulerPage.buildGuiPanel(); // Open the Scheduler GUI
         });
 
-        // Action listener to navigate to Add Note GUI
-        viewReminders.addActionListener(e -> {
-            guiFrame2.dispose(); // Close the Reminders window
-            addNoteGui addNotePage = new addNoteGui();
-            addNotePage.buildGuiPanel(); // Open Add Note GUI
-        });
-
         // Action listener to navigate to Edit Reminder GUI
         addReminderButton.addActionListener(e -> {
-            guiFrame2.dispose(); // Close the Reminders window
-            editReminderGui editReminderPage = new editReminderGui();
+            guiFrame2.dispose(); // Close the Daily Schedule GUI
+            addReminderGui editReminderPage = new addReminderGui(userId);
             editReminderPage.buildGuiPanel(); // Open Edit Reminder GUI
         });
+
+        // Action listener to display reminders
+        viewRemindersButton.addActionListener(e -> displayReminders());
     }
 
     private void updateDate() {
         LocalDate today = LocalDate.now(); // Get today's date
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy"); // Format the date
         Date.setText("Today: " + today.format(formatter)); // Set the formatted date text
+    }
+
+    private void displayReminders() {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "SELECT task_name, reminder_date, reminder_time, priority, content " +
+                    "FROM reminders WHERE user_id = ? ORDER BY reminder_date, reminder_time";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, userId);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    StringBuilder reminders = new StringBuilder();
+                    while (rs.next()) {
+                        reminders.append("Task: ").append(rs.getString("task_name")).append("\n")
+                                .append("Date: ").append(rs.getString("reminder_date")).append("\n")
+                                .append("Time: ").append(rs.getString("reminder_time")).append("\n")
+                                .append("Priority: ").append(rs.getString("priority")).append("\n")
+                                .append("Notes: ").append(rs.getString("content")).append("\n\n");
+                    }
+                    viewRemindersPane.setText(reminders.toString());
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(guiFrame2, "Error loading reminders: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
