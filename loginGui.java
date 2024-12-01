@@ -7,7 +7,7 @@ public class loginGui {
     private JButton loginButton;
     private JButton createAccountButton;
     private JButton forgotUsernamePasswordButton;
-    private JTextField passwordField;
+    private JPasswordField passwordField; // Correctly use JPasswordField
     private JFrame guiFrame3 = new JFrame("Weekly Scheduler");
 
     private final String DB_URL = "jdbc:mysql://localhost:3306/scheduler_db"; // Update with your database URL
@@ -40,7 +40,9 @@ public class loginGui {
 
     private void login() {
         String username = usernameField.getText();
-        String password = passwordField.getText();
+        // Get the password from JPasswordField
+        char[] passwordChars = passwordField.getPassword();
+        String password = new String(passwordChars); // Convert char[] to String
 
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(guiFrame3, "Username and password cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);

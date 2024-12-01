@@ -9,17 +9,19 @@ public class addReminderGui {
     private JButton backButton;
     private JButton addReminderButton;
     private JTextField reminderNameField; // Title field
-    private JTextArea textArea1;  // Notes field
     private JCheckBox lowCheckBox;
     private JCheckBox midCheckBox;
     private JCheckBox highCheckBox;
-    private JTextField reminderDateField;
-    private JTextField reminderTimeField;
-    private JFrame guiFrame = new JFrame("Edit Reminder");
+    private JTextField reminderDateField; // Date input (MM/DD/YYYY)
+    private JTextField reminderTimeField; // Time input (hh:mm AM/PM)
+    private JCheckBox repeatDailyCheckBox; // Checkbox for Repeat Daily
+    private JFrame guiFrame = new JFrame("Add Reminder");
 
-    private final String DB_URL = "jdbc:mysql://localhost:3306/scheduler_db"; // Database URL
-    private final String DB_USER = "root"; // Database username
-    private final String DB_PASSWORD = "ilovelife2093003!"; // Database password
+    // Database connection details
+    private final String DB_URL = "jdbc:mysql://localhost:3306/scheduler_db"; // Update with your DB URL
+    private final String DB_USER = "root"; // Update with your DB username
+    private final String DB_PASSWORD = "ilovelife2093003!"; // Update with your DB password
+
     private int userId;
 
     public addReminderGui(int userId) {
@@ -34,12 +36,12 @@ public class addReminderGui {
 
         // Back to reminders page
         backButton.addActionListener(e -> {
-            guiFrame.dispose(); // Close Edit Reminder GUI
+            guiFrame.dispose(); // Close Add Reminder GUI
             dailyscheduleGui remindersPage = new dailyscheduleGui(userId); // Pass the correct userId
             remindersPage.buildGuiPanel();
         });
 
-        // Add or edit reminder
+        // Add reminder
         addReminderButton.addActionListener(e -> addReminder());
     }
 
@@ -48,8 +50,9 @@ public class addReminderGui {
         String dateInput = reminderDateField.getText().trim();
         String timeInput = reminderTimeField.getText().trim();
         String priority = getSelectedPriority();
-        String notes = textArea1.getText().trim();
+        boolean repeatDaily = repeatDailyCheckBox.isSelected(); // Check if Repeat Daily is selected
 
+        // Validate required fields
         if (taskName.isEmpty() || dateInput.isEmpty() || timeInput.isEmpty()) {
             JOptionPane.showMessageDialog(guiFrame, "Task Name, Date, and Time are required.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -79,18 +82,22 @@ public class addReminderGui {
             return;
         }
 
+        // Insert reminder into the database
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "INSERT INTO reminders (user_id, task_name, reminder_date, reminder_time, priority, content) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO reminders (user_id, task_name, reminder_date, reminder_time, priority, repeat_daily) VALUES (?, ?, ?, ?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, userId);
                 stmt.setString(2, taskName);
                 stmt.setString(3, formattedDate);
                 stmt.setString(4, formattedTime);
                 stmt.setString(5, priority);
-                stmt.setString(6, notes);
+                stmt.setBoolean(6, repeatDaily); // Save Repeat Daily status
 
                 stmt.executeUpdate();
                 JOptionPane.showMessageDialog(guiFrame, "Reminder added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                // Reset fields after saving
+                resetFields();
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -103,5 +110,15 @@ public class addReminderGui {
         if (midCheckBox.isSelected()) return "MEDIUM";
         if (highCheckBox.isSelected()) return "HIGH";
         return null; // No priority selected
+    }
+
+    private void resetFields() {
+        reminderNameField.setText("");
+        reminderDateField.setText("");
+        reminderTimeField.setText("");
+        lowCheckBox.setSelected(false);
+        midCheckBox.setSelected(false);
+        highCheckBox.setSelected(false);
+        repeatDailyCheckBox.setSelected(false);
     }
 }

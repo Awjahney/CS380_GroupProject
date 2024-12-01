@@ -7,6 +7,7 @@ public class createAccGui {
     private JTextField usernameField; // Text field for username
     private JTextField passwordField; // Text field for password
     private JTextField accountIdField; // Text field for account ID
+    private JButton backButton;
     private JFrame guiFrame = new JFrame("Create Account");
 
     // Database connection details
@@ -22,6 +23,12 @@ public class createAccGui {
 
         // Add action listener for the Create Account button
         createAccountButton.addActionListener(e -> createAccount());
+
+        backButton.addActionListener(e -> {
+            guiFrame.dispose(); // Close the create account GUI
+            loginGui loginPage = new loginGui();
+            loginPage.buildGuiPanel(); // Open the login GUI
+        });
     }
 
     private void createAccount() {
