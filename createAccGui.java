@@ -11,9 +11,9 @@ public class createAccGui {
     private JFrame guiFrame = new JFrame("Create Account");
 
     // Database connection details
-    private final String DB_URL = "jdbc:mysql://localhost:3306/scheduler_db"; // Update with your DB URL
+    private final String DB_URL = "jdbc:mysql://localhost:3306/scheduler_db"; // Update with your database URL
     private final String DB_USER = "root"; // Update with your DB username
-    private final String DB_PASSWORD = "ilovelife2093003!"; // Update with your DB password
+    private final String DB_PASSWORD = "FlameBoy500!"; // Update with your DB password
 
     public void buildGuiPanel() {
         guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

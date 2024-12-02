@@ -12,9 +12,9 @@ public class reminderPopUp {
     private JPanel buttonPanel;
     private JFrame guiFrame;
 
-    private final String DB_URL = "jdbc:mysql://localhost:3306/scheduler_db"; // Database URL
-    private final String DB_USER = "root"; // Database username
-    private final String DB_PASSWORD = "ilovelife2093003!"; // Database password
+    private final String DB_URL = "jdbc:mysql://localhost:3306/scheduler_db"; // Update with your database URL
+    private final String DB_USER = "root"; // Update with your DB username
+    private final String DB_PASSWORD = "FlameBoy500!"; // Update with your DB password
 
     private int reminderId; // ID of the reminder to delete
 
