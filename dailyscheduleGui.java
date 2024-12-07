@@ -6,6 +6,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * The dailyscheduleGui class represents the graphical user interface for the daily schedule.
+ * It allows users to view, add, and remove reminders for the day.
+ *
+ * @since 1.0
+ */
 public class dailyscheduleGui {
     private JPanel guiPanel2;
     private JScrollPane guiPane;
@@ -36,15 +42,28 @@ public class dailyscheduleGui {
 
     private final String DB_URL = "jdbc:mysql://localhost:3306/scheduler_db"; // Update with your database URL
     private final String DB_USER = "root"; // Update with your DB username
-    private final String DB_PASSWORD = "FlameBoy500!"; // Update with your DB password
+    private final String DB_PASSWORD = "xynjeg-Hifmag-7quxty"; // Update with your DB password
 
     private int userId; // Logged-in user's ID
 
+    /**
+     * Constructor for dailyscheduleGui.
+     * Initializes the user ID and starts the reminder checker.
+     *
+     * @param userId The ID of the logged-in user.
+     * @since 1.0
+     */
     public dailyscheduleGui(int userId) {
         this.userId = userId;
         startReminderChecker(); // Start checking for reminders
     }
 
+    /**
+     * Builds the graphical user interface for the daily schedule page.
+     * Sets up the layout, buttons, and event listeners for the user interface.
+     *
+     * @since 1.0
+     */
     public void buildGuiPanel() {
         guiFrame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         guiFrame2.setSize(600, 900);
@@ -76,12 +95,24 @@ public class dailyscheduleGui {
         removeReminderButton.addActionListener(e -> removeReminder());
     }
 
+    /**
+     * Updates the date label with the current date in the format: "Today: Day, Month Date, Year".
+     *
+     * @since 1.0
+     */
     private void updateDate() {
         LocalDate today = LocalDate.now(); // Get today's date
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy"); // Format the date
         Date.setText("Today: " + today.format(formatter)); // Set the formatted date text
     }
 
+    /**
+     * Displays the list of reminders for the user from the database.
+     * Each reminder includes details such as task name, date, time, and priority.
+     *
+     * @since 1.0
+     * @see #displayReminderContent(ResultSet)
+     */
     private void displayReminders() {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "SELECT reminder_id, task_name, reminder_date, reminder_time, priority, repeat_daily " +
@@ -108,6 +139,13 @@ public class dailyscheduleGui {
         }
     }
 
+    /**
+     * Removes a reminder based on the reminder ID input by the user.
+     * The reminder is deleted from the database.
+     *
+     * @since 1.0
+     * @throws NumberFormatException if the input reminder ID is not a valid number.
+     */
     private void removeReminder() {
         String reminderIdInput = reminderIdField.getText().trim();
         if (reminderIdInput.isEmpty()) {
@@ -132,6 +170,13 @@ public class dailyscheduleGui {
         }
     }
 
+    /**
+     * Starts a background thread that checks for reminders every minute.
+     * The reminders are checked for the current time and shown to the user if any are due.
+     *
+     * @since 1.0
+     * @see #checkForReminders()
+     */
     private void startReminderChecker() {
         Timer timer = new Timer(true); // Run the timer as a daemon thread
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -142,6 +187,12 @@ public class dailyscheduleGui {
         }, 0, 60 * 1000); // Check every minute
     }
 
+    /**
+     * Checks for reminders that are due based on the current date and time.
+     * If any reminders are due, they are displayed in a pop-up window.
+     *
+     * @since 1.0
+     */
     private void checkForReminders() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -185,6 +236,15 @@ public class dailyscheduleGui {
         }
     }
 
+    /**
+     * Schedules the reminder for the next day if it repeats daily.
+     *
+     * @param conn The database connection.
+     * @param reminderId The ID of the reminder.
+     * @param rs The result set containing reminder data.
+     * @throws SQLException If an SQL exception occurs.
+     * @since 1.0
+     */
     private void scheduleNextDayReminder(Connection conn, int reminderId, ResultSet rs) throws SQLException {
         try {
             String reminderDate = rs.getString("reminder_date");
@@ -202,6 +262,14 @@ public class dailyscheduleGui {
         }
     }
 
+    /**
+     * Marks a reminder as inactive after it has been shown.
+     *
+     * @param conn The database connection.
+     * @param reminderId The ID of the reminder.
+     * @throws SQLException If an SQL exception occurs.
+     * @since 1.0
+     */
     private void markReminderAsInactive(Connection conn, int reminderId) throws SQLException {
         String sql = "UPDATE reminders SET is_active = FALSE WHERE reminder_id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -210,8 +278,14 @@ public class dailyscheduleGui {
         }
     }
 
-    private void showReminderPopup(int reminderId, String reminderContent) {
-        SwingUtilities.invokeLater(() -> new reminderPopUp(reminderId, reminderContent));
+    /**
+     * Shows a reminder pop-up with the reminder details.
+     *
+     * @param reminderId The ID of the reminder.
+     * @param reminderContent The content of the reminder.
+     * @since 1.0
+     */
+    private void reminderPopUp(int reminderId, String reminderContent) {
+        JOptionPane.showMessageDialog(guiFrame2, reminderContent, "Reminder", JOptionPane.INFORMATION_MESSAGE);
     }
-
 }

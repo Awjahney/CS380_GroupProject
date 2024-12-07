@@ -1,6 +1,11 @@
 import javax.swing.*;
 import java.sql.*;
 
+/**
+ * This class provides the GUI functionality for the "Forgot Info" screen where users can retrieve their account details.
+ * @since 1.0
+ * @version 1.0
+ */
 public class forgotInfoGui {
     private JPanel guiPanel; // Main panel
     private JButton findAccountButton; // Button to find account
@@ -11,8 +16,14 @@ public class forgotInfoGui {
 
     private final String DB_URL = "jdbc:mysql://localhost:3306/scheduler_db"; // Update with your database URL
     private final String DB_USER = "root"; // Update with your DB username
-    private final String DB_PASSWORD = "FlameBoy500!"; // Update with your DB password
+    private final String DB_PASSWORD = "xynjeg-Hifmag-7quxty"; // Update with your DB password
 
+    /**
+     * Builds the GUI panel for the "Forgot Info" screen and adds action listeners to buttons.
+     * Initializes the frame size, layout, and visibility.
+     * @since 1.0
+     * @version 1.0
+     */
     public void buildGuiPanel() {
         // Initialize the GUI frame
         guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -31,6 +42,15 @@ public class forgotInfoGui {
         });
     }
 
+    /**
+     * Retrieves the account information (username and password) from the database
+     * based on the entered Account ID and displays it in the text area.
+     * If the account ID is empty or not found, an error message is shown.
+     * @since 1.0
+     * @version 1.0
+     * @param accountId the Account ID entered by the user
+     * @throws SQLException if there is an error during database access
+     */
     private void findAccountInfo() {
         String accountId = accountIdField.getText(); // Get Account ID from text field
 

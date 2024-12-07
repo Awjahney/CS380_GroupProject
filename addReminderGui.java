@@ -4,30 +4,40 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * GUI for adding a new reminder to the user's schedule.
+ * This class allows the user to input a task name, date, time, priority, and repeat options.
+ */
 public class addReminderGui {
     private JPanel guiPanel;
     private JButton backButton;
     private JButton addReminderButton;
-    private JTextField reminderNameField; // Title field
+    private JTextField reminderNameField;
     private JCheckBox lowCheckBox;
     private JCheckBox midCheckBox;
     private JCheckBox highCheckBox;
-    private JTextField reminderDateField; // Date input (MM/DD/YYYY)
-    private JTextField reminderTimeField; // Time input (hh:mm AM/PM)
-    private JCheckBox repeatDailyCheckBox; // Checkbox for Repeat Daily
+    private JTextField reminderDateField;
+    private JTextField reminderTimeField;
+    private JCheckBox repeatDailyCheckBox;
     private JFrame guiFrame = new JFrame("Add Reminder");
 
-    // Database connection details
-    private final String DB_URL = "jdbc:mysql://localhost:3306/scheduler_db"; // Update with your database URL
-    private final String DB_USER = "root"; // Update with your DB username
-    private final String DB_PASSWORD = "FlameBoy500!"; // Update with your DB password
-
+    private final String DB_URL = "jdbc:mysql://localhost:3306/scheduler_db";
+    private final String DB_USER = "root";
+    private final String DB_PASSWORD = "xynjeg-Hifmag-7quxty";
     private int userId;
 
+    /**
+     * Constructs an addReminderGui instance with the logged-in user's ID.
+     *
+     * @param userId The logged-in user's ID
+     */
     public addReminderGui(int userId) {
-        this.userId = userId; // Pass userId to identify the logged-in user
+        this.userId = userId;
     }
 
+    /**
+     * Sets up the GUI components and adds action listeners for buttons.
+     */
     public void buildGuiPanel() {
         guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         guiFrame.setSize(400, 300);
@@ -36,8 +46,8 @@ public class addReminderGui {
 
         // Back to reminders page
         backButton.addActionListener(e -> {
-            guiFrame.dispose(); // Close Add Reminder GUI
-            dailyscheduleGui remindersPage = new dailyscheduleGui(userId); // Pass the correct userId
+            guiFrame.dispose();
+            dailyscheduleGui remindersPage = new dailyscheduleGui(userId);
             remindersPage.buildGuiPanel();
         });
 
@@ -45,12 +55,16 @@ public class addReminderGui {
         addReminderButton.addActionListener(e -> addReminder());
     }
 
+    /**
+     * Adds a new reminder to the database with the provided information.
+     * Validates the input fields and formats the date and time before saving to the database.
+     */
     private void addReminder() {
         String taskName = reminderNameField.getText().trim();
         String dateInput = reminderDateField.getText().trim();
         String timeInput = reminderTimeField.getText().trim();
         String priority = getSelectedPriority();
-        boolean repeatDaily = repeatDailyCheckBox.isSelected(); // Check if Repeat Daily is selected
+        boolean repeatDaily = repeatDailyCheckBox.isSelected();
 
         // Validate required fields
         if (taskName.isEmpty() || dateInput.isEmpty() || timeInput.isEmpty()) {
@@ -58,28 +72,12 @@ public class addReminderGui {
             return;
         }
 
-        // Convert the date to the correct format
-        String formattedDate;
-        try {
-            SimpleDateFormat inputDateFormat = new SimpleDateFormat("MM/dd/yyyy");
-            SimpleDateFormat dbDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date date = inputDateFormat.parse(dateInput);
-            formattedDate = dbDateFormat.format(date);
-        } catch (ParseException e) {
-            JOptionPane.showMessageDialog(guiFrame, "Invalid date format. Please use MM/DD/YYYY.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        // Convert the date and time formats
+        String formattedDate = formatDate(dateInput);
+        String formattedTime = formatTime(timeInput);
 
-        // Convert the time to the correct format
-        String formattedTime;
-        try {
-            SimpleDateFormat inputTimeFormat = new SimpleDateFormat("hh:mm a");
-            SimpleDateFormat dbTimeFormat = new SimpleDateFormat("HH:mm:ss");
-            Date time = inputTimeFormat.parse(timeInput);
-            formattedTime = dbTimeFormat.format(time);
-        } catch (ParseException e) {
-            JOptionPane.showMessageDialog(guiFrame, "Invalid time format. Please use hh:mm AM/PM.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+        if (formattedDate == null || formattedTime == null) {
+            return; // If date or time formatting fails, stop the process
         }
 
         // Insert reminder into the database
@@ -91,7 +89,7 @@ public class addReminderGui {
                 stmt.setString(3, formattedDate);
                 stmt.setString(4, formattedTime);
                 stmt.setString(5, priority);
-                stmt.setBoolean(6, repeatDaily); // Save Repeat Daily status
+                stmt.setBoolean(6, repeatDaily);
 
                 stmt.executeUpdate();
                 JOptionPane.showMessageDialog(guiFrame, "Reminder added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -105,6 +103,47 @@ public class addReminderGui {
         }
     }
 
+    /**
+     * Converts the input date string into the correct format for the database.
+     *
+     * @param dateInput The input date string (MM/DD/YYYY)
+     * @return The formatted date string (YYYY-MM-DD), or null if invalid format
+     */
+    private String formatDate(String dateInput) {
+        try {
+            SimpleDateFormat inputDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+            SimpleDateFormat dbDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = inputDateFormat.parse(dateInput);
+            return dbDateFormat.format(date);
+        } catch (ParseException e) {
+            JOptionPane.showMessageDialog(guiFrame, "Invalid date format. Please use MM/DD/YYYY.", "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+    }
+
+    /**
+     * Converts the input time string into the correct format for the database.
+     *
+     * @param timeInput The input time string (hh:mm AM/PM)
+     * @return The formatted time string (HH:mm:ss), or null if invalid format
+     */
+    private String formatTime(String timeInput) {
+        try {
+            SimpleDateFormat inputTimeFormat = new SimpleDateFormat("hh:mm a");
+            SimpleDateFormat dbTimeFormat = new SimpleDateFormat("HH:mm:ss");
+            Date time = inputTimeFormat.parse(timeInput);
+            return dbTimeFormat.format(time);
+        } catch (ParseException e) {
+            JOptionPane.showMessageDialog(guiFrame, "Invalid time format. Please use hh:mm AM/PM.", "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves the selected priority value from the checkboxes.
+     *
+     * @return The selected priority ("LOW", "MEDIUM", or "HIGH")
+     */
     private String getSelectedPriority() {
         if (lowCheckBox.isSelected()) return "LOW";
         if (midCheckBox.isSelected()) return "MEDIUM";
@@ -112,6 +151,9 @@ public class addReminderGui {
         return null; // No priority selected
     }
 
+    /**
+     * Resets all input fields to their default values.
+     */
     private void resetFields() {
         reminderNameField.setText("");
         reminderDateField.setText("");

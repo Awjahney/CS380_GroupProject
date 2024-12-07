@@ -1,6 +1,14 @@
 import javax.swing.*;
 import java.sql.*;
 
+/**
+ * A GUI class for creating a new user account.
+ * Provides a panel with fields for username, password, and account ID,
+ * and includes functionality to create a new account in the database.
+ *
+ * @since 1.0
+ * @version 1.0
+ */
 public class createAccGui {
     private JPanel guiPanel; // Main panel
     private JButton createAccountButton; // Button to create an account
@@ -13,8 +21,14 @@ public class createAccGui {
     // Database connection details
     private final String DB_URL = "jdbc:mysql://localhost:3306/scheduler_db"; // Update with your database URL
     private final String DB_USER = "root"; // Update with your DB username
-    private final String DB_PASSWORD = "FlameBoy500!"; // Update with your DB password
+    private final String DB_PASSWORD = "xynjeg-Hifmag-7quxty"; // Update with your DB password
 
+    /**
+     * Builds and displays the GUI panel for creating a new account.
+     * Sets up the window, buttons, and event listeners.
+     *
+     * @since 1.0
+     */
     public void buildGuiPanel() {
         guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         guiFrame.setSize(600, 300);
@@ -24,6 +38,7 @@ public class createAccGui {
         // Add action listener for the Create Account button
         createAccountButton.addActionListener(e -> createAccount());
 
+        // Add action listener for the back button
         backButton.addActionListener(e -> {
             guiFrame.dispose(); // Close the create account GUI
             loginGui loginPage = new loginGui();
@@ -31,6 +46,14 @@ public class createAccGui {
         });
     }
 
+    /**
+     * Handles the process of creating a new account.
+     * This includes validating the inputs and inserting the account details into the database.
+     * Displays a success or error message based on the result.
+     *
+     * @throws SQLException if there is an error with the database connection or query
+     * @since 1.0
+     */
     private void createAccount() {
         // Get input values
         String username = usernameField.getText();
